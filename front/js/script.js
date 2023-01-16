@@ -1,59 +1,28 @@
+//------------------------------------------------------------------------
+// Récupération des produits de l'api
+//------------------------------------------------------------------------ 
 fetch("http://localhost:3000/api/products")
   .then((res) => res.json())
-  .then((data) => addProducts(data))
-
-
-function addProducts(canaps) {
-  canaps.forEach((canap) => {
-    const { _id, imageUrl, altTxt, name, description } = canap
-    const anchor = makeAnchor(_id)
-    const article = document.createElement("article")
-    const image = makeImageDiv(imageUrl, altTxt)
-    const h3 = makeH3(name)
-    const p = makeParagraph(description)
-
-    appendElementsToArticle(article, [image, h3, p])
-    appendArticleToAnchor(anchor, article)
+  .then((objetProduits) => {
+    console.table(objetProduits);
+    lesKanaps(objetProduits);
   })
-}
-
-function appendElementsToArticle(article, array) {
-  array.forEach((item) => {
-    article.appendChild(item)
-  })
-}
-
-function makeAnchor(id) {
-  const anchor = document.createElement("a")
-  anchor.href = "./product.html?id=" + id
-  return anchor
-}
-
-function appendArticleToAnchor(anchor, article) {
-  const items = document.querySelector("#items")
-  if (items != null) {
-    items.appendChild(anchor)
-    anchor.appendChild(article)
+  .catch((err) => {
+    document.querySelector(".titles").innerHTML = "<h1>erreur 404</h1>";
+    console.log("erreur 404, sur ressource api:" + err);
+  });
+//----------------------------------------------------------------------
+// fonction d'affichage des produits de l'api sur la page index
+//----------------------------------------------------------------------
+function lesKanaps(index) {
+  let zoneArticle = document.querySelector("#items");
+  for (let article of index) {
+    zoneArticle.innerHTML += `<a href="./product.html?_id=${article._id}">
+    <article>
+      <img src="${article.imageUrl}" alt="${article.altTxt}">
+      <h3 class="productName">${article.name}</h3>
+      <p class="productDescription">${article.description}</p>
+    </article>
+  </a>`;
   }
-}
-function makeImageDiv(imageUrl, altTxt) {
-  const image = document.createElement("img")
-  image.src = imageUrl
-  image.alt = altTxt
-  image.removeAttribute("title")
-  image.removeAttribute("style")
-  return image
-}
-
-function makeH3(name) {
-  const h3 = document.createElement("h3")
-  h3.textContent = name
-  h3.classList.add("productName")
-  return h3
-}
-function makeParagraph(description) {
-  const p = document.createElement("p")
-  p.textContent = description
-  p.classList.add("productDescription")
-  return p
 }
